@@ -8,7 +8,7 @@
 tools:
   # ---------------- Core tools ----------------
   - name: clarify
-    description: "Gửi một câu hỏi cho người dùng."
+    description: "Hỏi lại người dùng khi thiếu thông tin bắt buộc (asset_id, employee_id, environment không rõ) hoặc cần xác nhận trước write action. Dùng response_type='text' khi thiếu ID, 'yes_no' khi xác nhận trước create_ticket, 'choice' khi cần chọn từ danh sách cố định."
     parameters:
       type: object
       properties:
@@ -96,7 +96,7 @@ tools:
       required: [query]
 
   - name: create_ticket
-    description: "Tạo một ticket hỗ trợ."
+    description: "Tạo một ticket hỗ trợ. ĐÂY LÀ WRITE ACTION — PHẢI gọi clarify(response_type='yes_no') để xác nhận TRƯỚC. KHÔNG gọi create_ticket cùng lúc với clarify. Chỉ gọi sau khi user đã xác nhận rõ ràng."
     parameters:
       type: object
       properties:
