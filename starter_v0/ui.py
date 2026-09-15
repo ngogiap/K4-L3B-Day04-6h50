@@ -6,7 +6,7 @@ import json
 import os
 import re
 from datetime import datetime
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
 from urllib.parse import parse_qs, urlparse
@@ -78,6 +78,28 @@ def get_or_create_session(session_id: str, provider_name: str, version_label: st
     }
     SESSIONS[session_id] = session
     return session
+
+
+def extract_reply_text(text: str | None) -> str | None:
+    """system_prompt.md instructs the model to answer as JSON
+    ({"intent","action","reply","evidence_ids"}) so run_eval.py's routing
+    checks have a consistent shape to inspect. That's fine for eval, but the
+    web chat is for humans, so show the human-readable `reply` field instead
+    of the raw JSON blob when the model followed that instruction. Returns
+    None (caller keeps the original text) when it isn't that JSON shape, so
+    plain-text replies are untouched.
+    """
+    if not text:
+        return None
+    stripped = text.strip()
+    if not (stripped.startswith("{") and stripped.endswith("}")):
+        return None
+    try:
+        parsed = json.loads(stripped)
+    except (ValueError, TypeError):
+        return None
+    reply = parsed.get("reply") if isinstance(parsed, dict) else None
+    return reply if isinstance(reply, str) and reply.strip() else None
 
 
 def mock_deterministic_fallback(user_text: str, provider_error: str) -> dict[str, Any]:
@@ -270,7 +292,8 @@ class HelpdeskUIHandler(BaseHTTPRequestHandler):
                     max_tool_rounds=4,
                 )
                 turn_record.update(result)
-                assistant_text = result["assistant_text"]
+                assistant_text = extract_reply_text(result["assistant_text"]) or result["assistant_text"]
+                turn_record["assistant_text"] = assistant_text
                 session["history"].append({"role": "user", "content": user_text})
                 session["history"].append({"role": "assistant", "content": assistant_text})
             except Exception as exc:
@@ -323,7 +346,10 @@ def main() -> None:
     HelpdeskUIHandler.system_prompt_path = args.system_prompt
     HelpdeskUIHandler.tools_path = args.tools
 
-    server = HTTPServer(("0.0.0.0", args.port), HelpdeskUIHandler)
+    # Threaded so a slow/hung provider call on one request (a real risk with
+    # the free model, see complete()'s timeout) doesn't block every other
+    # request (page load, transcript fetch, another chat turn).
+    server = ThreadingHTTPServer(("0.0.0.0", args.port), HelpdeskUIHandler)
     print(f"==================================================")
     print(f"  Northstar IT Helpdesk Web UI running!")
     print(f"  URL: http://localhost:{args.port}")

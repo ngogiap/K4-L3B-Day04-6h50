@@ -39,7 +39,10 @@ class OpenAIProvider:
         if not api_key:
             raise RuntimeError(f"Missing API key env var: {self.api_key_env}")
 
-        client = OpenAI(api_key=api_key, base_url=self.base_url)
+        # SDK defaults are a 600s read timeout and 2 retries with backoff, so a
+        # slow/rate-limited free model can hang for minutes before the caller
+        # (e.g. ui.py's fallback) ever sees an error. Fail faster instead.
+        client = OpenAI(api_key=api_key, base_url=self.base_url, timeout=30.0, max_retries=1)
         kwargs: dict[str, Any] = {
             "model": model or self.default_model,
             "messages": messages,
