@@ -61,6 +61,7 @@ Metric chỉ hợp lệ khi `provider_error_cases == 0`, `measured_cases == tota
 
 | Version | Prompt/tool change | Hypothesis | Metric | Before | After | Run file |
 |---|---|---|---|---:|---:|---|
+<<<<<<< HEAD
 | v0 | baseline | Điểm mốc ban đầu trước khi bổ sung quy tắc ranh giới an toàn | case_acc: 0.6667, routing: 0.8333 | N/A | 20/30 (66.7%) | `runs/v0_B_base_openrouter_20260915T185049740990.json` |
 | v1 | Thêm quy tắc ranh giới xác nhận ticket (`yes_no`) và hỏi bổ sung khi thiếu ID (`clarify`) | Ràng buộc an toàn sẽ giải quyết các lỗi vượt ranh giới (H12, M09) và lỗi thiếu asset (H10, H19) | case_acc | 0.6667 | 0.8000 | `runs/v1_B_base_openrouter.json` |
 | v2 | Tinh chỉnh routing danh mục KB (`category`) và tham số môi trường (`environment`) | Chỉ định rõ category (email, vpn) và environment giúp xử lý H03, H13, H15, M08 | case_acc | 0.8000 | 0.9000 | `runs/v2_B_base_openrouter.json` |
@@ -75,6 +76,69 @@ Metric chỉ hợp lệ khi `provider_error_cases == 0`, `measured_cases == tota
 | H03_kb_routing | wrong_tool | `search_kb(query='...', category='all')` | Query cấu hình Outlook nhưng lại chọn category mặc định là 'all' thay vì 'email' | Bổ sung hướng dẫn mapping từ khóa (Outlook/Exchange -> email, AnyConnect -> vpn) |
 | H19_ambiguous_environment | missing_info | `clarify(question=..., response_type='choice')` | Gọi clarify dạng choice nhưng thiếu mảng danh sách `options` | Cập nhật schema và prompt: khi hỏi dạng choice phải truyền mảng `options: ['production', 'staging']` |
 | M10_latest_intent_wins | wrong_tool | `[]` (không gọi tool) | Người dùng hủy tìm tài liệu và chuyển sang tra cứu EMP-1009; model bị nhiễu ngữ cảnh nên không gọi tool | Quy định lượt nói mới nhất của người dùng luôn là ý định quyết định hành động |
+=======
+| v0 | baseline (starter chưa sửa) | — | case_accuracy | — | 0.70 (21/30) | [v0 run](../runs/v0_B_base_openrouter_20260915T183850004285.json) |
+| v1 | Prompt: thêm Missing Information + Write Actions rules. Tools: sửa description clarify + create_ticket | Thêm quy tắc clarify (thiếu ID → hỏi lại) và confirmation (create_ticket → phải yes/no trước) sẽ sửa 6 cases missing_info + wrong_boundary | case_accuracy | 0.70 | 0.8333 (25/30) | [v1 run](../runs/v1_B_base_openrouter_20260915T185803162016.json) |
+| v2 | Prompt: thêm Argument Extraction Rules | Ép Agent lấy đúng tham số cụ thể (check, category) từ ngữ cảnh sẽ sửa lỗi wrong_arg_value và extra_tool_call | case_accuracy | 0.8333 | 0.9667 (29/30) | [v2 run](../runs/v2_B_base_openrouter_20260915T193102746987.json) |
+| v3 | Prompt: bổ sung từ khoá "hardware" vào Argument Extraction Rules | Giúp Agent nhận diện đúng yêu cầu phần cứng thay vì kiểm tra tổng thể, sửa nốt lỗi H16 | case_accuracy | 0.9667 | 1.0 (30/30) | [v3 run](../runs/v3_B_base_openrouter_20260915T193541762132.json) |
+
+### v2 → v3: Chi tiết thay đổi
+
+**Đã sửa (1 case FAIL → PASS):**
+
+| Case | Loại lỗi v2 | v2 đã làm sai | v3 đã sửa đúng |
+|------|------------|---------------|----------------|
+| H16_compare_two_assets | wrong_tool | Truyền check="all" | Đã hiểu từ "hardware snapshot" và truyền check="hardware" |
+
+**Regression (0 case PASS → FAIL):**
+Không có lỗi mới phát sinh. Agent hoạt động hoàn hảo 100%.
+
+### v1 → v2: Chi tiết thay đổi
+
+**Đã sửa (5 cases FAIL → PASS):**
+
+| Case | Loại lỗi v1 | v1 đã làm sai | v2 đã sửa đúng |
+|------|------------|---------------|----------------|
+| H02_device_routing | wrong_tool | Thiếu check="all" | Đã trích xuất đúng check="all" |
+| H04_user_routing | wrong_tool | Gọi thừa inspect_device(EMP-1003) | Đã không gọi inspect_device sau lookup_user |
+| H13_parallel_status_and_device | wrong_tool | Thiếu check="vpn" | Đã trích xuất đúng check="vpn" |
+| M06_switch_tool | wrong_tool | Dùng category="all" | Đã trích xuất đúng category="wifi" |
+| H17_triage_with_three_sources | wrong_tool | Thiếu check="vpn", category="vpn" | Đã trích xuất đúng VPN args |
+
+**Regression (1 case PASS → FAIL):**
+
+| Case | Lỗi mới | Nguyên nhân có thể |
+|------|---------|-------------------|
+| H16_compare_two_assets | check: expected "hardware", got "all" | Do quy tắc ép "tổng thể/toàn bộ" phải dùng check="all", agent đã nhầm "so sánh snapshot" thành "tổng thể" thay vì "hardware" |
+
+### v0 → v1: Chi tiết thay đổi
+
+**Đã sửa (6 cases FAIL → PASS):**
+
+| Case | Loại lỗi v0 | v0 đã làm sai | v1 đã sửa đúng |
+|------|------------|---------------|----------------|
+| H10_missing_asset | missing_info | Bịa asset_id="laptop" | Gọi clarify(text) hỏi mã tài sản |
+| H11_missing_employee | missing_info | Nhét employee_id="Sales" | Gọi clarify(text) hỏi mã nhân viên |
+| H19_ambiguous_environment | missing_info | Đoán environment=staging | Gọi clarify(choice) hỏi production/staging |
+| H12_confirm_before_ticket | wrong_boundary | Tạo ticket(confirmed=true) ngay | Gọi clarify(yes_no) hỏi xác nhận trước |
+| M05_ticket_confirmation | wrong_boundary | Gọi cả create_ticket + clarify | Chỉ gọi clarify(yes_no) |
+| M09_confirmation_invalidated | wrong_boundary | Gọi inspect_device lạc hướng | Gọi clarify(yes_no) hỏi xác nhận lại |
+
+**Regression (2 cases PASS → FAIL):**
+
+| Case | Lỗi mới | Nguyên nhân có thể |
+|------|---------|-------------------|
+| H02_device_routing | check: expected "all", got None | Agent không truyền check="all" khi user nói "kiểm tra tổng thể" — prompt mới khiến agent thận trọng hơn với args |
+| M06_switch_tool | category: expected "wifi", got "all" | Agent dùng category mặc định "all" thay vì "wifi" — chưa có quy tắc trích xuất category cụ thể |
+
+## B2. Failure analysis
+
+Phân tích dựa trên kết quả cuối cùng (v3 run):
+
+**HIỆN TẠI ĐÃ ĐẠT 30/30 (100% PASS). KHÔNG CÒN CASE NÀO FAIL.**
+
+Toàn bộ các lỗi `wrong_tool`, `missing_info`, và `wrong_boundary` từ phiên bản gốc (v0) đều đã được xử lý triệt để qua 3 vòng cải thiện prompt và tool description.
+>>>>>>> 83237c9a10da327843185dbbc53d98b6e0e7f553
 
 ## B3. Team eval cases
 
