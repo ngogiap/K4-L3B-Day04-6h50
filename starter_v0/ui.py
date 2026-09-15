@@ -80,20 +80,39 @@ def get_or_create_session(session_id: str, provider_name: str, version_label: st
     return session
 
 
-def mock_deterministic_fallback(user_text: str) -> dict[str, Any]:
-    """Graceful fallback if provider quota is exceeded or offline, returning deterministic local mock tool results."""
+def mock_deterministic_fallback(user_text: str, provider_error: str) -> dict[str, Any]:
+    """Used only when the real provider call raises (rate limit, offline, etc).
+
+    This must never assert a fact about tool state that the real tool result
+    doesn't back up. Earlier versions hardcoded narratives (e.g. always saying
+    a service was "normal") regardless of what the tool actually returned,
+    which produced transcripts contradicting the real tool_results (see
+    v0_openrouter_web_20260915T194527764448: assistant said VPN was normal
+    while the real check_service_status result said degraded with an open
+    incident). Every branch below is tagged `fallback: True` with the real
+    provider_error, and any assistant text is either a direct echo of the
+    real tool result or a plain "no model response" notice — never a scripted
+    conclusion about what the tool result means.
+    """
     text_lower = user_text.lower()
-    
-    if "vpn" in text_lower and ("production" in text_lower or "sự cố" in text_lower or "trạng thái" in text_lower):
-        call = {"name": "check_service_status", "args": {"service": "vpn", "environment": "production"}}
-        ev = execute_tool_call(ToolCall(name="check_service_status", args=call["args"]))
+    disclaimer = f"[FALLBACK - loi provider, khong phai phan hoi that tu model: {provider_error}]\n"
+
+    def _tool_turn(name: str, args: dict[str, Any], status: str = "answered") -> dict[str, Any]:
+        call = {"name": name, "args": args}
+        ev = execute_tool_call(ToolCall(name=name, args=args))
+        result_summary = json.dumps(ev["result"], ensure_ascii=False, indent=2)
         return {
-            "status": "answered",
-            "assistant_text": "Dịch vụ VPN trên production hiện đang hoạt động bình thường, ghi nhận độ trễ trung bình 42ms.",
+            "status": status,
+            "fallback": True,
+            "provider_error": provider_error,
+            "assistant_text": disclaimer + f"Ket qua thuc te tu tool `{name}` (chua qua model dien giai):\n{result_summary}",
             "rounds": [{"round": 1, "tool_calls": [call], "tool_results": [ev]}],
-            "tool_events": [ev]
+            "tool_events": [ev],
         }
-    
+
+    if "vpn" in text_lower and ("production" in text_lower or "sự cố" in text_lower or "trạng thái" in text_lower):
+        return _tool_turn("check_service_status", {"service": "vpn", "environment": "production"})
+
     if "lt-204" in text_lower or "lt-240" in text_lower or "lt-501" in text_lower or "lt-105" in text_lower:
         matched_id = "LT-204"
         for candidate in ["LT-204", "LT-240", "LT-501", "LT-105"]:
@@ -101,69 +120,40 @@ def mock_deterministic_fallback(user_text: str) -> dict[str, Any]:
                 matched_id = candidate
                 break
         check_val = "vpn" if "vpn" in text_lower else ("hardware" if "phần cứng" in text_lower or "màn hình" in text_lower else ("software" if "phần mềm" in text_lower else "all"))
-        call = {"name": "inspect_device", "args": {"asset_id": matched_id, "check": check_val}}
-        ev = execute_tool_call(ToolCall(name="inspect_device", args=call["args"]))
-        return {
-            "status": "answered",
-            "assistant_text": f"Kết quả kiểm tra thiết bị {matched_id} (kiểm tra: {check_val}): Hệ thống và các thông số kỹ thuật hoạt động ổn định.",
-            "rounds": [{"round": 1, "tool_calls": [call], "tool_results": [ev]}],
-            "tool_events": [ev]
-        }
+        return _tool_turn("inspect_device", {"asset_id": matched_id, "check": check_val})
 
     if "tạo ticket" in text_lower or "lập ticket" in text_lower:
-        call = {"name": "clarify", "args": {"question": "Bạn có chắc chắn muốn xác nhận tạo ticket sự cố này không?", "response_type": "yes_no"}}
-        ev = execute_tool_call(ToolCall(name="clarify", args=call["args"]))
-        return {
-            "status": "waiting_for_user",
-            "assistant_text": "Trước khi tạo ticket hỗ trợ, tôi cần xác nhận từ bạn. Bạn có chắc chắn muốn tạo ticket không?",
-            "rounds": [{"round": 1, "tool_calls": [call], "tool_results": [ev]}],
-            "tool_events": [ev]
-        }
+        result = _tool_turn(
+            "clarify",
+            {"question": "Bạn có chắc chắn muốn xác nhận tạo ticket sự cố này không?", "response_type": "yes_no"},
+            status="waiting_for_user",
+        )
+        result["assistant_text"] = disclaimer + "Truoc khi tao ticket, can xac nhan tu ban (cau hoi mau, chua qua model)."
+        return result
 
     if "chớp giật" in text_lower or ("máy của mình" in text_lower and not any(k in text_lower for k in ["lt-", "pr-"])):
-        call = {"name": "clarify", "args": {"question": "Vui lòng cung cấp mã tài sản (Asset ID) dán ở đáy laptop của bạn để kiểm tra.", "response_type": "text"}}
-        ev = execute_tool_call(ToolCall(name="clarify", args=call["args"]))
-        return {
-            "status": "waiting_for_user",
-            "assistant_text": "Bạn vui lòng cung cấp mã tài sản (Asset ID dán ở đáy laptop, ví dụ LT-204) để tôi có thể kiểm tra phần cứng.",
-            "rounds": [{"round": 1, "tool_calls": [call], "tool_results": [ev]}],
-            "tool_events": [ev]
-        }
+        result = _tool_turn(
+            "clarify",
+            {"question": "Vui lòng cung cấp mã tài sản (Asset ID) dán ở đáy laptop của bạn để kiểm tra.", "response_type": "text"},
+            status="waiting_for_user",
+        )
+        result["assistant_text"] = disclaimer + "Can Asset ID de kiem tra phan cung (cau hoi mau, chua qua model)."
+        return result
 
     if "quy định" in text_lower or "chính sách" in text_lower or "ai bên ngoài" in text_lower:
-        call = {"name": "policy", "args": {"policy_area": "external_tools", "query": "Quy định công cụ AI bên ngoài"}}
-        ev = execute_tool_call(ToolCall(name="policy", args=call["args"]))
-        return {
-            "status": "answered",
-            "assistant_text": "Theo chính sách IT của Northstar Labs, nhân viên chỉ được sử dụng các công cụ AI bên ngoài đã được phê duyệt và nghiêm cấm nhập mã nguồn bảo mật hoặc dữ liệu cá nhân.",
-            "rounds": [{"round": 1, "tool_calls": [call], "tool_results": [ev]}],
-            "tool_events": [ev]
-        }
+        return _tool_turn("policy", {"policy_area": "external_tools", "query": "Quy định công cụ AI bên ngoài"})
 
     if "dell" in text_lower or "latitude" in text_lower or "thông số" in text_lower:
-        call = {"name": "search_device_info", "args": {"manufacturer": "Dell", "model": "Latitude 5440", "query_type": "specs"}}
-        ev = execute_tool_call(ToolCall(name="search_device_info", args=call["args"]))
-        return {
-            "status": "answered",
-            "assistant_text": "Thông số kỹ thuật dòng Dell Latitude 5440: CPU Intel Core thế hệ 13, RAM tối đa 64GB DDR5, màn hình 14-inch FHD chống chói, Wi-Fi 6E.",
-            "rounds": [{"round": 1, "tool_calls": [call], "tool_results": [ev]}],
-            "tool_events": [ev]
-        }
+        return _tool_turn("search_device_info", {"manufacturer": "Dell", "model": "Latitude 5440", "query_type": "specs"})
 
-    if "thời tiết" in text_lower or "phở" in text_lower or "nấu" in text_lower:
-        return {
-            "status": "answered",
-            "assistant_text": "Yêu cầu của bạn nằm ngoài phạm vi hỗ trợ kỹ thuật CNTT của Northstar Labs. Tôi chỉ có thể hỗ trợ các vấn đề về thiết bị, mạng, phần mềm và tài khoản công ty.",
-            "rounds": [],
-            "tool_events": []
-        }
-
-    # Default fallback response
+    # No matching tool keyword: report the real provider error, do not fabricate an answer.
     return {
-        "status": "answered",
-        "assistant_text": f"Tôi đã tiếp nhận yêu cầu: '{user_text}'. Hệ thống đang sẵn sàng xử lý qua các công cụ hỗ trợ IT Helpdesk của Northstar Labs.",
+        "status": "provider_error",
+        "fallback": True,
+        "provider_error": provider_error,
+        "assistant_text": disclaimer + "Khong co ket qua tool de doi chieu cho yeu cau nay. Vui long thu lai sau khi provider phuc hoi.",
         "rounds": [],
-        "tool_events": []
+        "tool_events": [],
     }
 
 
@@ -266,6 +256,8 @@ class HelpdeskUIHandler(BaseHTTPRequestHandler):
                 "assistant_text": None,
                 "rounds": [],
                 "tool_events": [],
+                "fallback": False,
+                "provider_error": None,
             }
 
             try:
@@ -282,8 +274,9 @@ class HelpdeskUIHandler(BaseHTTPRequestHandler):
                 session["history"].append({"role": "user", "content": user_text})
                 session["history"].append({"role": "assistant", "content": assistant_text})
             except Exception as exc:
-                # Use deterministic local mock fallback if API is rate-limited or fails
-                fallback_res = mock_deterministic_fallback(user_text)
+                # Provider call failed (rate limit, offline, ...). Fall back to a
+                # clearly-tagged local response instead of a real model reply.
+                fallback_res = mock_deterministic_fallback(user_text, str(exc))
                 turn_record.update(fallback_res)
                 assistant_text = fallback_res["assistant_text"]
                 session["history"].append({"role": "user", "content": user_text})
@@ -300,6 +293,8 @@ class HelpdeskUIHandler(BaseHTTPRequestHandler):
                 "rounds": turn_record.get("rounds", []),
                 "tool_events": turn_record.get("tool_events", []),
                 "status": turn_record.get("status"),
+                "fallback": turn_record.get("fallback", False),
+                "provider_error": turn_record.get("provider_error"),
             }
 
             self.send_response(200)

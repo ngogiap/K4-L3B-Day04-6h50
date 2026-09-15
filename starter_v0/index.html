@@ -1210,9 +1210,16 @@
           toolCardsHtml += '</div>';
         }
 
+        const fallbackBannerHtml = data.fallback ? `
+          <div class="tool-badge error" style="display:block; margin-bottom:8px; padding:6px 10px;">
+            ⚠️ FALLBACK: provider loi (${escapeHtml(data.provider_error || "unknown")}), day khong phai phan hoi that tu model.
+          </div>
+        ` : "";
+
         assistantGroup.innerHTML = `
-          <div class="msg-meta">Northstar Assistant</div>
+          <div class="msg-meta">Northstar Assistant${data.fallback ? " (fallback)" : ""}</div>
           <div class="assistant-bubble">
+            ${fallbackBannerHtml}
             <div>${escapeHtml(data.assistant_text || "")}</div>
             ${toolCardsHtml}
             ${clarifyActionsHtml}
