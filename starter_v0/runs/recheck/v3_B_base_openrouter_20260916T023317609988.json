@@ -1,5 +1,5 @@
 {
-  "run_id": "v3_B_base_openrouter_20260915T190636563922",
+  "run_id": "v3_B_base_openrouter_20260916T023317609988",
   "version": "v3",
   "artifact_version": "v3+p8d4431d33c41+ta28b82896054",
   "prompt_hash": "8d4431d33c414f720edcb6f6ddb913dc2f67fffa5f81fa48ee69527b3b1c946c",
@@ -8,13 +8,13 @@
   "suite": "base",
   "provider": "openrouter",
   "model": "openai/gpt-4o-mini",
-  "system_prompt": "H:\\AI2026\\chatAI\\K4-L3B-Day04-6h50\\starter_v0\\artifacts\\system_prompt.md",
-  "tools": "H:\\AI2026\\chatAI\\K4-L3B-Day04-6h50\\starter_v0\\artifacts\\tools.yaml",
+  "system_prompt": "artifacts\\versions\\v3\\system_prompt.md",
+  "tools": "artifacts\\versions\\v3\\tools.yaml",
   "eval_cases": "data\\eval_base.json",
   "dataset_id": "day04_v3_helpdesk_base",
   "dataset_role": "base",
   "description": "Fixed core eval for the IT Helpdesk Agent. Keep built-in tool names and all supplied cases unchanged, including prompts, expected behavior, and arguments. Test team-built bonus tools with team-authored cases.",
-  "generated_at": "2026-09-15T19:06:36",
+  "generated_at": "2026-09-16T02:33:17",
   "summary": {
     "total_cases": 30,
     "measured_cases": 30,
@@ -648,7 +648,7 @@
           {
             "name": "clarify",
             "args": {
-              "question": "Bạn có thể cung cấp mã tài sản của laptop không?",
+              "question": "Bạn vui lòng cung cấp mã tài sản của laptop để tôi có thể kiểm tra Wi-Fi.",
               "response_type": "text"
             }
           }
@@ -663,12 +663,12 @@
         {
           "tool": "clarify",
           "args": {
-            "question": "Bạn có thể cung cấp mã tài sản của laptop không?",
+            "question": "Bạn vui lòng cung cấp mã tài sản của laptop để tôi có thể kiểm tra Wi-Fi.",
             "response_type": "text"
           },
           "result": {
             "tool": "clarify",
-            "question": "Bạn có thể cung cấp mã tài sản của laptop không?",
+            "question": "Bạn vui lòng cung cấp mã tài sản của laptop để tôi có thể kiểm tra Wi-Fi.",
             "response_type": "text",
             "options": [],
             "awaiting_user": true
@@ -1302,7 +1302,7 @@
           {
             "name": "clarify",
             "args": {
-              "question": "Bạn muốn tạo một ticket với tóm tắt là \"lỗi VPN LT-204\", mức ưu tiên là \"high\". Bạn có xác nhận không?",
+              "question": "Bạn muốn tạo một ticket với tóm tắt là 'lỗi VPN LT-204', mức ưu tiên 'high'. Bạn có xác nhận thông tin này không?",
               "response_type": "yes_no"
             }
           }
@@ -1317,12 +1317,12 @@
         {
           "tool": "clarify",
           "args": {
-            "question": "Bạn muốn tạo một ticket với tóm tắt là \"lỗi VPN LT-204\", mức ưu tiên là \"high\". Bạn có xác nhận không?",
+            "question": "Bạn muốn tạo một ticket với tóm tắt là 'lỗi VPN LT-204', mức ưu tiên 'high'. Bạn có xác nhận thông tin này không?",
             "response_type": "yes_no"
           },
           "result": {
             "tool": "clarify",
-            "question": "Bạn muốn tạo một ticket với tóm tắt là \"lỗi VPN LT-204\", mức ưu tiên là \"high\". Bạn có xác nhận không?",
+            "question": "Bạn muốn tạo một ticket với tóm tắt là 'lỗi VPN LT-204', mức ưu tiên 'high'. Bạn có xác nhận thông tin này không?",
             "response_type": "yes_no",
             "options": [],
             "awaiting_user": true
@@ -1373,7 +1373,7 @@
           {
             "name": "search_kb",
             "args": {
-              "query": "khắc phục Wi-Fi",
+              "query": "Wi-Fi",
               "category": "wifi",
               "top_k": 3
             }
@@ -1389,13 +1389,13 @@
         {
           "tool": "search_kb",
           "args": {
-            "query": "khắc phục Wi-Fi",
+            "query": "Wi-Fi",
             "category": "wifi",
             "top_k": 3
           },
           "result": {
             "tool": "search_kb",
-            "query": "khắc phục Wi-Fi",
+            "query": "Wi-Fi",
             "category": "wifi",
             "results": [
               {
@@ -2001,13 +2001,13 @@
                   "label": "Packet Loss",
                   "detail": "12%",
                   "source": "DT-087",
-                  "status": "active"
+                  "status": "Reported"
                 },
                 {
                   "label": "DIMM B1",
-                  "detail": "Lỗi",
+                  "detail": "Faulty",
                   "source": "DT-087",
-                  "status": "active"
+                  "status": "Reported"
                 }
               ],
               "template": "handoff",
@@ -2030,13 +2030,13 @@
                 "label": "Packet Loss",
                 "detail": "12%",
                 "source": "DT-087",
-                "status": "active"
+                "status": "Reported"
               },
               {
                 "label": "DIMM B1",
-                "detail": "Lỗi",
+                "detail": "Faulty",
                 "source": "DT-087",
-                "status": "active"
+                "status": "Reported"
               }
             ],
             "template": "handoff",
@@ -2045,7 +2045,7 @@
           "result": {
             "tool": "format_incident_report",
             "template": "handoff",
-            "markdown": "# Handoff: DT-087 hardware\n\n- **Packet Loss:** 12%\n- **DIMM B1:** Lỗi\n\n- Owner: unassigned\n- Status: needs review",
+            "markdown": "# Handoff: DT-087 hardware\n\n- **Packet Loss:** 12%\n- **DIMM B1:** Faulty\n\n- Owner: unassigned\n- Status: needs review",
             "finding_count": 2
           }
         }
@@ -2085,7 +2085,7 @@
         "routing_correct": true,
         "args_correct": true,
         "actual_tool_calls": [],
-        "actual_text": "{\n  \"intent\": \"cancel_ticket_creation\",\n  \"action\": \"acknowledge_cancellation\",\n  \"reply\": \"Tôi đã hiểu yêu cầu hủy tạo ticket.\",\n  \"evidence_ids\": []\n}",
+        "actual_text": "{\n  \"intent\": \"cancel_ticket_creation\",\n  \"action\": \"acknowledge\",\n  \"reply\": \"Tôi đã hiểu yêu cầu hủy tạo ticket.\",\n  \"evidence_ids\": []\n}",
         "case_failure_type": "unnecessary_tool",
         "observed_mismatch": null,
         "failure_type": null,
@@ -2258,7 +2258,7 @@
           {
             "name": "clarify",
             "args": {
-              "question": "Bạn xác nhận tóm tắt là 'lỗi Wi-Fi LT-240', mức ưu tiên là 'critical' và không có mã tài sản nào?",
+              "question": "Bạn xác nhận tóm tắt là 'lỗi Wi-Fi LT-240', mức ưu tiên là 'critical' và không có mã tài sản nào được chỉ định?",
               "response_type": "yes_no"
             }
           }
@@ -2273,12 +2273,12 @@
         {
           "tool": "clarify",
           "args": {
-            "question": "Bạn xác nhận tóm tắt là 'lỗi Wi-Fi LT-240', mức ưu tiên là 'critical' và không có mã tài sản nào?",
+            "question": "Bạn xác nhận tóm tắt là 'lỗi Wi-Fi LT-240', mức ưu tiên là 'critical' và không có mã tài sản nào được chỉ định?",
             "response_type": "yes_no"
           },
           "result": {
             "tool": "clarify",
-            "question": "Bạn xác nhận tóm tắt là 'lỗi Wi-Fi LT-240', mức ưu tiên là 'critical' và không có mã tài sản nào?",
+            "question": "Bạn xác nhận tóm tắt là 'lỗi Wi-Fi LT-240', mức ưu tiên là 'critical' và không có mã tài sản nào được chỉ định?",
             "response_type": "yes_no",
             "options": [],
             "awaiting_user": true

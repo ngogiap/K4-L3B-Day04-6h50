@@ -1,58 +1,57 @@
 # CP2 — Evidence v0–v3
 
-Công cụ hỗ trợ: Codex đọc trace, sửa artifact, chạy OpenRouter và tổng hợp kết quả thật. Thành viên tự kiểm tra kết quả và tự viết INDIVIDUAL.
+Chuỗi chính thức cho so sánh này là bốn run tái kiểm tra ngày 16/09/2026, dùng snapshot `artifacts/versions/v0–v3/`. Hash SHA256 đầy đủ và đường dẫn run nằm trong [version_log.csv](version_log.csv). Đã đối chiếu hash prompt/tools, model, 30 ID/input/expect và số câu được đo. Các run cũ cùng nhãn version nhưng khác hash không thuộc chuỗi này.
 
 ## Điều kiện
 
-- Provider: OpenRouter; model: `openai/gpt-4o-mini`; temperature: `0.0`.
-- Bộ case: `data/eval_base.json`, 30 case. Đã đối chiếu ID, input và expect giống nhau trong cả bốn run.
-- SHA256 bộ case hiện tại: `8d9b4180a2d3715fd1351efb4990af20e0b149d40e6155510f2605fecb2ec3ed`.
-- Mỗi run: 30/30 measured, 0 provider errors. Không sửa evaluator hoặc bộ case.
-- Snapshot prompt/tool: `versions/v0/` đến `versions/v3/`; hash đã đối chiếu với run JSON. Artifact đang dùng khớp v3.
+- Provider: OpenRouter; model: `openai/gpt-4o-mini`.
+- Mỗi run: 30/30 measured, 0 provider errors; suite `base`.
+- SHA256 file eval_base.json hiện tại: `8d9b4180a2d3715fd1351efb4990af20e0b149d40e6155510f2605fecb2ec3ed`.
+- Snapshot dùng đường dẫn `artifacts/versions/v0/` đến `artifacts/versions/v3/`; không suy ra artifact mặc định hiện tại trùng snapshot.
 
 ## So sánh
 
-| Version | Đạt | Case accuracy | Routing | Arguments | Multi-turn | Run |
-|---|---:|---:|---:|---:|---:|---|
-| v0 | 21/30 | 70.00% | 76.67% | 70.00% | 80.00% | [v0_B_base_openrouter_20260915T183850004285.json](../runs/v0_B_base_openrouter_20260915T183850004285.json) |
-| v1 | 20/30 | 66.67% | 83.33% | 66.67% | 80.00% | [v1_B_base_openrouter_20260915T190345556504.json](../runs/v1_B_base_openrouter_20260915T190345556504.json) |
-| v2 | 25/30 | 83.33% | 83.33% | 83.33% | 80.00% | [v2_B_base_openrouter_20260915T190520255653.json](../runs/v2_B_base_openrouter_20260915T190520255653.json) |
-| v3 | 27/30 | 90.00% | 93.33% | 90.00% | 100.00% | [v3_B_base_openrouter_20260915T190636563922.json](../runs/v3_B_base_openrouter_20260915T190636563922.json) |
+| Version | Thay đổi snapshot | Giả thuyết | Trước | Sau | Run |
+|---|---|---|---:|---:|---|
+| v0 | none | Mốc so sánh | — | 21/30 (0.7000) | [v0 run](../runs/recheck/v0_B_base_openrouter_20260916T023106740768.json) |
+| v1 | system_prompt.md | Hỏi lại khi thiếu thông tin giúp tránh tự đoán | 0.7000 | 20/30 (0.6667) | [v1 run](../runs/recheck/v1_B_base_openrouter_20260916T023150888480.json) |
+| v2 | tools.yaml | Bắt buộc và mô tả rõ tham số giúp giảm lỗi input | 0.6667 | 25/30 (0.8333) | [v2 run](../runs/recheck/v2_B_base_openrouter_20260916T023233883355.json) |
+| v3 | system_prompt.md | Xác nhận riêng cho payload hiện tại giúp giảm lỗi ranh giới | 0.8333 | 27/30 (0.9000) | [v3 run](../runs/recheck/v3_B_base_openrouter_20260916T023317609988.json) |
 
 ## Giả thuyết và thay đổi từng vòng
 
 ### v1
 
 - File sửa: `system_prompt.md`. Lý do: Thiếu mã định danh hoặc môi trường chưa rõ.
-- Giả thuyết: Quy tắc hỏi lại giúp tránh tự đoán thông tin.
-- Case chuyển FAIL → PASS: không có.
-- Case chuyển PASS → FAIL: H02_device_routing.
+- Giả thuyết: Hỏi lại khi thiếu thông tin giúp tránh tự đoán.
+- FAIL → PASS: không có.
+- PASS → FAIL: H02_device_routing.
 
 ### v2
 
-- File sửa: `tools.yaml`. Lý do: v1 bỏ response_type/check hoặc chọn sai check.
+- File sửa: `tools.yaml`. Lý do: Thiếu hoặc sai response_type/check.
 - Giả thuyết: Bắt buộc và mô tả rõ tham số giúp giảm lỗi input.
-- Case chuyển FAIL → PASS: H02_device_routing, H10_missing_asset, H11_missing_employee, H13_parallel_status_and_device, H17_triage_with_three_sources.
-- Case chuyển PASS → FAIL: không có.
+- FAIL → PASS: H02_device_routing, H10_missing_asset, H11_missing_employee, H13_parallel_status_and_device, H17_triage_with_three_sources.
+- PASS → FAIL: không có.
 
 ### v3
 
-- File sửa: `system_prompt.md`. Lý do: v2 còn gọi tạo ticket trước xác nhận và xử lý sai payload đã sửa.
-- Giả thuyết: Xác nhận riêng cho payload hiện tại giúp giảm lỗi ranh giới hành động.
-- Case chuyển FAIL → PASS: M05_ticket_confirmation, M09_confirmation_invalidated.
-- Case chuyển PASS → FAIL: không có.
+- File sửa: `system_prompt.md`. Lý do: Tạo ticket trước xác nhận hoặc dùng xác nhận cũ.
+- Giả thuyết: Xác nhận riêng cho payload hiện tại giúp giảm lỗi ranh giới.
+- FAIL → PASS: M05_ticket_confirmation, M09_confirmation_invalidated.
+- PASS → FAIL: không có.
 
 ## Lỗi còn lại ở v3
 
-| Case | Failures |
-|---|---|
-| H04_user_routing | extra tool call inspect_device |
-| H12_confirm_before_ticket | response_type: expected 'yes_no', got 'text' |
-| H19_ambiguous_environment | missing tool call clarify; extra tool call check_service_status |
+| Case v3 | Failure type | Lỗi quan sát |
+|---|---|---|
+| H04_user_routing | wrong_tool | extra tool call inspect_device |
+| H12_confirm_before_ticket | wrong_boundary | response_type: expected 'yes_no', got 'text' |
+| H19_ambiguous_environment | missing_info | missing tool call clarify; extra tool call check_service_status |
 
 ## Kiểm tra tool result
 
-Các lỗi thực thi và lần tạo ticket dưới đây được lấy từ tool_results, tách khỏi điểm routing.
+Các lỗi và trạng thái dưới đây được trích từ tool_results của đúng bốn run được chọn.
 
 | Version | Case | Tool | Error/status |
 |---|---|---|---|
@@ -68,22 +67,18 @@ Các lỗi thực thi và lần tạo ticket dưới đây được lấy từ t
 | v2 | H04_user_routing | inspect_device | asset_not_found |
 | v2 | H12_confirm_before_ticket | create_ticket | created |
 | v2 | M05_ticket_confirmation | create_ticket | needs_confirmation |
-| v2 | M05_ticket_confirmation | lookup_user | employee_not_found |
 | v2 | M09_confirmation_invalidated | create_ticket | created |
 | v3 | H04_user_routing | inspect_device | asset_not_found |
 
 ## Lệnh tái chạy
 
-Chạy trong starter_v0; thay N bằng 1, 2 hoặc 3 để dùng đúng snapshot:
+Chạy trong `starter_v0`, thay `$v` bằng version cần kiểm tra:
 
 ```powershell
-python run_eval.py --provider openrouter --model openai/gpt-4o-mini --version vN --suite base --eval-cases data/eval_base.json --system-prompt artifacts/versions/vN/system_prompt.md --tools artifacts/versions/vN/tools.yaml
-python scripts/parse_runs.py runs --output artifacts/run-analysis.csv
+$v = "v0"
+python run_eval.py --provider openrouter --model openai/gpt-4o-mini --version $v --suite base --eval-cases data/eval_base.json --system-prompt "artifacts/versions/$v/system_prompt.md" --tools "artifacts/versions/$v/tools.yaml" --runs-dir runs/recheck
 ```
 
 ## Giới hạn
 
-- Chỉ một run mỗi phiên bản; kết quả có thể dao động dù temperature bằng 0. Không khẳng định quan hệ nhân quả từ một lần chạy.
-- Đây là bộ base dùng để cải tiến, chưa phải kiểm thử độc lập hay CP3 safety.
-- V0–v2 đã tạo ticket giả lập khi chưa có xác nhận ở H12; v2 còn tạo ở M09 sau sửa payload. V3 không gọi create_ticket trong bộ base. Prompt không thay thế kiểm soát xác nhận ở tầng thực thi.
-- Ticket phát sinh nằm trong thư mục tickets được Git ignore; không phải bằng chứng rằng thao tác ngoài hệ thống đã thành công.
+Chỉ chọn một run cho mỗi snapshot để so sánh; không khẳng định độ ổn định hoặc quan hệ nhân quả. Bộ base không thay thế kiểm thử CP3. Lỗi chọn tool/tham số và lỗi thực thi tool được tách riêng. Không suy ra an toàn tuyệt đối từ điểm tổng.

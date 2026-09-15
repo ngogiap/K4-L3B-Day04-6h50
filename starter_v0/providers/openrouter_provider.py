@@ -12,5 +12,5 @@ class OpenRouterProvider(OpenAIProvider):
         super().__init__(
             api_key_env="OPENROUTER_API_KEY",
             base_url=os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1"),
-            default_model="nvidia/nemotron-3.5-lightning:free",
+            default_model="openrouter/free",
         )

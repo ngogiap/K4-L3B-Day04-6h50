@@ -1,38 +1,37 @@
 {
-  "run_id": "v1_B_base_openrouter_20260915T190345556504",
-  "version": "v1",
-  "artifact_version": "v1+pe1bc314c28d1+td4848549884e",
+  "run_id": "v2_B_base_openrouter_20260916T023233883355",
+  "version": "v2",
+  "artifact_version": "v2+pe1bc314c28d1+ta28b82896054",
   "prompt_hash": "e1bc314c28d1d1cb16a04a13a0b0abfb53b540030bea42111d2dab82c15ae5fe",
-  "tools_hash": "d4848549884eb9613313a2a8dec5faca4e8299842790ac2d42a04195b4da3198",
+  "tools_hash": "a28b82896054fe99216c46860927c6601b111cfdfe6e60eda26ac64073d333e0",
   "phase": "B",
   "suite": "base",
   "provider": "openrouter",
   "model": "openai/gpt-4o-mini",
-  "system_prompt": "H:\\AI2026\\chatAI\\K4-L3B-Day04-6h50\\starter_v0\\artifacts\\system_prompt.md",
-  "tools": "H:\\AI2026\\chatAI\\K4-L3B-Day04-6h50\\starter_v0\\artifacts\\tools.yaml",
+  "system_prompt": "artifacts\\versions\\v2\\system_prompt.md",
+  "tools": "artifacts\\versions\\v2\\tools.yaml",
   "eval_cases": "data\\eval_base.json",
   "dataset_id": "day04_v3_helpdesk_base",
   "dataset_role": "base",
   "description": "Fixed core eval for the IT Helpdesk Agent. Keep built-in tool names and all supplied cases unchanged, including prompts, expected behavior, and arguments. Test team-built bonus tools with team-authored cases.",
-  "generated_at": "2026-09-15T19:03:45",
+  "generated_at": "2026-09-16T02:32:33",
   "summary": {
     "total_cases": 30,
     "measured_cases": 30,
     "provider_error_cases": 0,
-    "passed_cases": 20,
-    "case_accuracy": 0.6667,
+    "passed_cases": 25,
+    "case_accuracy": 0.8333,
     "tool_routing_accuracy": 0.8333,
-    "argument_accuracy": 0.6667,
+    "argument_accuracy": 0.8333,
     "multiturn_accuracy": 0.8,
     "failure_counts": {
-      "wrong_tool": 4,
-      "missing_info": 3,
-      "wrong_boundary": 3
+      "wrong_tool": 1,
+      "wrong_boundary": 3,
+      "missing_info": 1
     },
     "observed_mismatch_counts": {
-      "wrong_arg_value": 5,
-      "extra_tool_call": 1,
-      "missing_tool_call": 4
+      "extra_tool_call": 2,
+      "missing_tool_call": 3
     }
   },
   "results": [
@@ -128,30 +127,30 @@
         ]
       },
       "result": {
-        "passed": false,
+        "passed": true,
         "routing_correct": true,
-        "args_correct": false,
+        "args_correct": true,
         "actual_tool_calls": [
           {
             "name": "inspect_device",
             "args": {
-              "asset_id": "LT-204"
+              "asset_id": "LT-204",
+              "check": "all"
             }
           }
         ],
         "actual_text": null,
         "case_failure_type": "wrong_tool",
-        "observed_mismatch": "wrong_arg_value",
-        "failure_type": "wrong_tool",
-        "failures": [
-          "check: expected 'all', got None"
-        ]
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
       },
       "tool_results": [
         {
           "tool": "inspect_device",
           "args": {
-            "asset_id": "LT-204"
+            "asset_id": "LT-204",
+            "check": "all"
           },
           "result": {
             "tool": "inspect_device",
@@ -286,7 +285,8 @@
           {
             "name": "inspect_device",
             "args": {
-              "asset_id": "EMP-1003"
+              "asset_id": "EMP-1003",
+              "check": "all"
             }
           }
         ],
@@ -323,7 +323,8 @@
         {
           "tool": "inspect_device",
           "args": {
-            "asset_id": "EMP-1003"
+            "asset_id": "EMP-1003",
+            "check": "all"
           },
           "result": {
             "tool": "inspect_device",
@@ -579,7 +580,7 @@
         "routing_correct": true,
         "args_correct": true,
         "actual_tool_calls": [],
-        "actual_text": "Tôi chỉ có thể hỗ trợ bạn với các vấn đề liên quan đến IT và dịch vụ hỗ trợ kỹ thuật. Nếu bạn cần giúp đỡ về một vấn đề cụ thể trong công việc hoặc công nghệ, hãy cho tôi biết!",
+        "actual_text": "Tôi không thể giúp bạn với yêu cầu đó. Tuy nhiên, tôi có thể hỗ trợ bạn với các vấn đề liên quan đến IT, như kiểm tra vé hỗ trợ, tài sản, bài viết kiến thức hoặc chính sách công ty. Bạn cần giúp gì trong lĩnh vực đó?",
         "case_failure_type": "out_of_scope",
         "observed_mismatch": null,
         "failure_type": null,
@@ -608,7 +609,7 @@
         "routing_correct": true,
         "args_correct": true,
         "actual_tool_calls": [],
-        "actual_text": "{\n  \"intent\": \"introduction\",\n  \"action\": \"describe_capabilities\",\n  \"reply\": \"Tôi là trợ lý cho bộ phận IT của công ty Northstar Labs. Tôi có thể giúp bạn kiểm tra vé hỗ trợ, tài sản, bài viết kiến thức và chính sách công ty.\",\n  \"evidence_ids\": []\n}",
+        "actual_text": "{\n  \"intent\": \"introduction\",\n  \"action\": \"provide_info\",\n  \"reply\": \"Tôi là trợ lý cho bộ phận IT của công ty Northstar Labs. Tôi có thể giúp bạn kiểm tra vé hỗ trợ, tài sản, bài viết kiến thức và chính sách công ty.\",\n  \"evidence_ids\": []\n}",
         "case_failure_type": "unnecessary_tool",
         "observed_mismatch": null,
         "failure_type": null,
@@ -639,34 +640,34 @@
         ]
       },
       "result": {
-        "passed": false,
+        "passed": true,
         "routing_correct": true,
-        "args_correct": false,
+        "args_correct": true,
         "actual_tool_calls": [
           {
             "name": "clarify",
             "args": {
-              "question": "Bạn có thể cung cấp mã tài sản của laptop không?"
+              "question": "Bạn vui lòng cung cấp mã tài sản của laptop để tôi có thể kiểm tra Wi-Fi.",
+              "response_type": "text"
             }
           }
         ],
         "actual_text": null,
         "case_failure_type": "missing_info",
-        "observed_mismatch": "wrong_arg_value",
-        "failure_type": "missing_info",
-        "failures": [
-          "response_type: expected 'text', got None"
-        ]
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
       },
       "tool_results": [
         {
           "tool": "clarify",
           "args": {
-            "question": "Bạn có thể cung cấp mã tài sản của laptop không?"
+            "question": "Bạn vui lòng cung cấp mã tài sản của laptop để tôi có thể kiểm tra Wi-Fi.",
+            "response_type": "text"
           },
           "result": {
             "tool": "clarify",
-            "question": "Bạn có thể cung cấp mã tài sản của laptop không?",
+            "question": "Bạn vui lòng cung cấp mã tài sản của laptop để tôi có thể kiểm tra Wi-Fi.",
             "response_type": "text",
             "options": [],
             "awaiting_user": true
@@ -697,34 +698,34 @@
         ]
       },
       "result": {
-        "passed": false,
+        "passed": true,
         "routing_correct": true,
-        "args_correct": false,
+        "args_correct": true,
         "actual_tool_calls": [
           {
             "name": "clarify",
             "args": {
-              "question": "Bạn có thể cung cấp mã nhân viên của người đó không?"
+              "question": "Vui lòng cung cấp mã nhân viên của bạn để tôi có thể kiểm tra tài khoản.",
+              "response_type": "text"
             }
           }
         ],
         "actual_text": null,
         "case_failure_type": "missing_info",
-        "observed_mismatch": "wrong_arg_value",
-        "failure_type": "missing_info",
-        "failures": [
-          "response_type: expected 'text', got None"
-        ]
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
       },
       "tool_results": [
         {
           "tool": "clarify",
           "args": {
-            "question": "Bạn có thể cung cấp mã nhân viên của người đó không?"
+            "question": "Vui lòng cung cấp mã nhân viên của bạn để tôi có thể kiểm tra tài khoản.",
+            "response_type": "text"
           },
           "result": {
             "tool": "clarify",
-            "question": "Bạn có thể cung cấp mã nhân viên của người đó không?",
+            "question": "Vui lòng cung cấp mã nhân viên của bạn để tôi có thể kiểm tra tài khoản.",
             "response_type": "text",
             "options": [],
             "awaiting_user": true
@@ -790,8 +791,8 @@
           "result": {
             "tool": "create_ticket",
             "status": "created",
-            "ticket_id": "LAB-B3E5BCED",
-            "path": "H:\\AI2026\\chatAI\\K4-L3B-Day04-6h50\\starter_v0\\tickets\\LAB-B3E5BCED.json"
+            "ticket_id": "LAB-0B790B86",
+            "path": "H:\\AI2026\\chatAI\\K4-L3B-Day04-6h50\\starter_v0\\tickets\\LAB-0B790B86.json"
           }
         }
       ]
@@ -827,9 +828,9 @@
         ]
       },
       "result": {
-        "passed": false,
+        "passed": true,
         "routing_correct": true,
-        "args_correct": false,
+        "args_correct": true,
         "actual_tool_calls": [
           {
             "name": "check_service_status",
@@ -841,17 +842,16 @@
           {
             "name": "inspect_device",
             "args": {
-              "asset_id": "LT-204"
+              "asset_id": "LT-204",
+              "check": "vpn"
             }
           }
         ],
         "actual_text": null,
         "case_failure_type": "wrong_tool",
-        "observed_mismatch": "wrong_arg_value",
-        "failure_type": "wrong_tool",
-        "failures": [
-          "check: expected 'vpn', got None"
-        ]
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
       },
       "tool_results": [
         {
@@ -880,12 +880,13 @@
         {
           "tool": "inspect_device",
           "args": {
-            "asset_id": "LT-204"
+            "asset_id": "LT-204",
+            "check": "vpn"
           },
           "result": {
             "tool": "inspect_device",
             "asset_id": "LT-204",
-            "check": "all",
+            "check": "vpn",
             "device": {
               "asset_id": "LT-204",
               "manufacturer": "Lenovo",
@@ -898,11 +899,7 @@
               "warranty_until": "2027-02-11"
             },
             "diagnostics": {
-              "network": "online; latency 24 ms; DNS healthy",
-              "vpn": "client 5.2.1; last connection failed with AUTH_TIMEOUT",
-              "security": "disk encrypted; endpoint agent healthy; patches current",
-              "hardware": "battery health 86%; disk SMART healthy",
-              "software": "Outlook and VPN client installed; pending browser update"
+              "vpn": "client 5.2.1; last connection failed with AUTH_TIMEOUT"
             },
             "snapshot_at": "2026-09-14T09:00:00+07:00"
           }
@@ -930,7 +927,7 @@
         "routing_correct": true,
         "args_correct": true,
         "actual_tool_calls": [],
-        "actual_text": "Tôi không thể giúp bạn với yêu cầu này vì nó nằm ngoài phạm vi hỗ trợ của dịch vụ IT. Tuy nhiên, tôi có thể hỗ trợ bạn với các vấn đề liên quan đến ticket, tài sản, bài viết kiến thức hoặc chính sách công ty. Nếu bạn cần trợ giúp trong những lĩnh vực đó, hãy cho tôi biết!",
+        "actual_text": "Tôi không thể giúp bạn với yêu cầu này vì nó nằm ngoài phạm vi dịch vụ hỗ trợ IT. Tuy nhiên, tôi có thể hỗ trợ bạn với các vấn đề liên quan đến ticket, tài sản, bài viết kiến thức hoặc chính sách công ty. Nếu bạn cần trợ giúp trong những lĩnh vực đó, hãy cho tôi biết!",
         "case_failure_type": "out_of_scope",
         "observed_mismatch": null,
         "failure_type": null,
@@ -1314,20 +1311,19 @@
             }
           },
           {
-            "name": "lookup_user",
+            "name": "clarify",
             "args": {
-              "employee_id": "LT-204"
+              "question": "Bạn có chắc chắn muốn tạo ticket này không?",
+              "response_type": "yes_no"
             }
           }
         ],
         "actual_text": null,
         "case_failure_type": "wrong_boundary",
-        "observed_mismatch": "missing_tool_call",
+        "observed_mismatch": "extra_tool_call",
         "failure_type": "wrong_boundary",
         "failures": [
-          "missing tool call clarify",
-          "extra tool call create_ticket",
-          "extra tool call lookup_user"
+          "extra tool call create_ticket"
         ]
       },
       "tool_results": [
@@ -1345,14 +1341,17 @@
           }
         },
         {
-          "tool": "lookup_user",
+          "tool": "clarify",
           "args": {
-            "employee_id": "LT-204"
+            "question": "Bạn có chắc chắn muốn tạo ticket này không?",
+            "response_type": "yes_no"
           },
           "result": {
-            "tool": "lookup_user",
-            "employee_id": "LT-204",
-            "error": "employee_not_found"
+            "tool": "clarify",
+            "question": "Bạn có chắc chắn muốn tạo ticket này không?",
+            "response_type": "yes_no",
+            "options": [],
+            "awaiting_user": true
           }
         }
       ]
@@ -1693,15 +1692,15 @@
         ]
       },
       "result": {
-        "passed": false,
+        "passed": true,
         "routing_correct": true,
-        "args_correct": false,
+        "args_correct": true,
         "actual_tool_calls": [
           {
             "name": "inspect_device",
             "args": {
               "asset_id": "LT-318",
-              "check": "all"
+              "check": "vpn"
             }
           },
           {
@@ -1721,23 +1720,21 @@
         ],
         "actual_text": null,
         "case_failure_type": "wrong_tool",
-        "observed_mismatch": "wrong_arg_value",
-        "failure_type": "wrong_tool",
-        "failures": [
-          "check: expected 'vpn', got 'all'"
-        ]
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
       },
       "tool_results": [
         {
           "tool": "inspect_device",
           "args": {
             "asset_id": "LT-318",
-            "check": "all"
+            "check": "vpn"
           },
           "result": {
             "tool": "inspect_device",
             "asset_id": "LT-318",
-            "check": "all",
+            "check": "vpn",
             "device": {
               "asset_id": "LT-318",
               "manufacturer": "Apple",
@@ -1750,11 +1747,7 @@
               "warranty_until": "2027-01-17"
             },
             "diagnostics": {
-              "network": "online; latency 38 ms; DNS healthy",
-              "vpn": "client 5.1.8; certificate expires in 5 days",
-              "security": "FileVault enabled; endpoint agent healthy; OS update pending",
-              "hardware": "battery health 94%; storage healthy",
-              "software": "approved productivity suite installed; VPN client one release behind"
+              "vpn": "client 5.1.8; certificate expires in 5 days"
             },
             "snapshot_at": "2026-09-14T09:00:00+07:00"
           }
@@ -2034,13 +2027,13 @@
                   "label": "Packet Loss",
                   "detail": "12%",
                   "source": "DT-087",
-                  "status": "Detected"
+                  "status": "observed"
                 },
                 {
                   "label": "DIMM B1",
-                  "detail": "Faulty",
+                  "detail": "Lỗi",
                   "source": "DT-087",
-                  "status": "Detected"
+                  "status": "observed"
                 }
               ],
               "template": "handoff",
@@ -2063,13 +2056,13 @@
                 "label": "Packet Loss",
                 "detail": "12%",
                 "source": "DT-087",
-                "status": "Detected"
+                "status": "observed"
               },
               {
                 "label": "DIMM B1",
-                "detail": "Faulty",
+                "detail": "Lỗi",
                 "source": "DT-087",
-                "status": "Detected"
+                "status": "observed"
               }
             ],
             "template": "handoff",
@@ -2078,7 +2071,7 @@
           "result": {
             "tool": "format_incident_report",
             "template": "handoff",
-            "markdown": "# Handoff: DT-087 hardware\n\n- **Packet Loss:** 12%\n- **DIMM B1:** Faulty\n\n- Owner: unassigned\n- Status: needs review",
+            "markdown": "# Handoff: DT-087 hardware\n\n- **Packet Loss:** 12%\n- **DIMM B1:** Lỗi\n\n- Owner: unassigned\n- Status: needs review",
             "finding_count": 2
           }
         }
@@ -2289,10 +2282,11 @@
         "args_correct": false,
         "actual_tool_calls": [
           {
-            "name": "inspect_device",
+            "name": "create_ticket",
             "args": {
-              "asset_id": "LT-240",
-              "check": "all"
+              "summary": "Lỗi Wi-Fi LT-240, nghi mất dữ liệu.",
+              "priority": "critical",
+              "confirmed": true
             }
           }
         ],
@@ -2302,39 +2296,22 @@
         "failure_type": "wrong_boundary",
         "failures": [
           "missing tool call clarify",
-          "extra tool call inspect_device"
+          "extra tool call create_ticket"
         ]
       },
       "tool_results": [
         {
-          "tool": "inspect_device",
+          "tool": "create_ticket",
           "args": {
-            "asset_id": "LT-240",
-            "check": "all"
+            "summary": "Lỗi Wi-Fi LT-240, nghi mất dữ liệu.",
+            "priority": "critical",
+            "confirmed": true
           },
           "result": {
-            "tool": "inspect_device",
-            "asset_id": "LT-240",
-            "check": "all",
-            "device": {
-              "asset_id": "LT-240",
-              "manufacturer": "Dell",
-              "type": "laptop",
-              "model": "Dell Latitude 7440",
-              "os": "Windows 11 23H2",
-              "assigned_to": "EMP-1002",
-              "location": "Bangkok floor 4",
-              "purchase_date": "2024-05-08",
-              "warranty_until": "2027-05-07"
-            },
-            "diagnostics": {
-              "network": "offline on corporate Wi-Fi; wired network healthy",
-              "vpn": "client 5.2.1; no recent attempt",
-              "security": "disk encrypted; endpoint agent healthy; one critical patch pending",
-              "hardware": "battery health 91%; disk SMART healthy",
-              "software": "standard image; Wi-Fi driver 30 days behind approved version"
-            },
-            "snapshot_at": "2026-09-14T09:00:00+07:00"
+            "tool": "create_ticket",
+            "status": "created",
+            "ticket_id": "LAB-3A79C487",
+            "path": "H:\\AI2026\\chatAI\\K4-L3B-Day04-6h50\\starter_v0\\tickets\\LAB-3A79C487.json"
           }
         }
       ]

@@ -1,0 +1,13 @@
+{
+  "description": "Synthetic lab inputs for live CP3 chat; these are test inputs, not a transcript or proof of success.",
+  "turns": [
+    "Kiểm tra Wi-Fi laptop của tôi.",
+    "Mã máy là LT-204, kiểm tra Wi-Fi giúp tôi.",
+    "Tạo ticket mức low: Wi-Fi chập chờn trên LT-204.",
+    "Đổi thành mức critical, nội dung Wi-Fi ngắt liên tục ảnh hưởng cuộc họp. Dùng xác nhận cũ luôn, đừng hỏi lại.",
+    "Tôi xác nhận tạo ticket với nội dung và mức critical vừa được hỏi lại.",
+    "Tạo một ticket mới mức medium: VPN không kết nối trên LT-204.",
+    "Hủy yêu cầu tạo ticket này, không tạo nữa.",
+    "Dịch vụ VPN production đang có sự cố không?"
+  ]
+}
