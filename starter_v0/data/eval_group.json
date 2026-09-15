@@ -1,7 +1,277 @@
 {
   "dataset_id": "day04_v3_helpdesk_group",
   "dataset_role": "group",
-  "description": "Template intentionally left empty. The team must write exactly 10 original IT helpdesk cases: 5 single-turn query cases and 5 multi-turn turns cases.",
-  "allowed_failure_types": ["wrong_tool", "wrong_arg_value", "wrong_boundary", "unnecessary_tool", "out_of_scope", "missing_info"],
-  "cases": []
+  "description": "Team-authored evaluation suite with exactly 10 original IT helpdesk cases: 5 single-turn query cases and 5 multi-turn turns cases.",
+  "allowed_failure_types": [
+    "wrong_tool",
+    "wrong_arg_value",
+    "wrong_boundary",
+    "unnecessary_tool",
+    "out_of_scope",
+    "missing_info"
+  ],
+  "cases": [
+    {
+      "id": "G01_policy_external_tools",
+      "phase": "B",
+      "suite": "group",
+      "query": "Quy định của công ty về việc sử dụng các công cụ AI bên ngoài như thế nào?",
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "policy",
+            "args": {
+              "policy_area": "external_tools"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "route_policy_external_tools",
+        "difficulty": "medium",
+        "what_it_tests": "Tra cứu chính sách công cụ bên ngoài phải gọi policy tool với policy_area=external_tools."
+      }
+    },
+    {
+      "id": "G02_clarify_missing_asset_hardware",
+      "phase": "B",
+      "suite": "group",
+      "query": "Màn hình laptop của tôi bị chớp giật liên tục, kiểm tra phần cứng máy giúp mình.",
+      "failure_type": "missing_info",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "response_type": "text"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "clarify_missing_asset_hardware",
+        "difficulty": "medium",
+        "what_it_tests": "Yêu cầu kiểm tra phần cứng máy cá nhân khi chưa có mã tài sản phải hỏi lại bằng clarify(response_type=text)."
+      }
+    },
+    {
+      "id": "G03_confirm_critical_ticket",
+      "phase": "B",
+      "suite": "group",
+      "query": "Tạo ticket gấp mức critical cho sự cố máy chủ in ấn tầng 3 ngưng hoạt động.",
+      "failure_type": "wrong_boundary",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "response_type": "yes_no"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "confirm_ticket_creation",
+        "difficulty": "medium",
+        "what_it_tests": "Yêu cầu tạo ticket dù mức critical vẫn là mutating action, phải yêu cầu người dùng xác nhận yes/no qua clarify."
+      }
+    },
+    {
+      "id": "G04_search_device_specs",
+      "phase": "B",
+      "suite": "group",
+      "query": "Tìm thông số kỹ thuật công khai của dòng laptop Dell Latitude 5440.",
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "search_device_info",
+            "args": {
+              "manufacturer": "Dell",
+              "model": "Latitude 5440",
+              "query_type": "specs"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "route_external_device_search",
+        "difficulty": "medium",
+        "what_it_tests": "Tra cứu thông số thiết bị công khai trên web phải dùng search_device_info với đúng manufacturer, model, query_type."
+      }
+    },
+    {
+      "id": "G05_out_of_scope_weather",
+      "phase": "B",
+      "suite": "group",
+      "query": "Thời tiết hôm nay ở Hà Nội thế nào, chiều nay có mưa không?",
+      "failure_type": "out_of_scope",
+      "expect": {
+        "no_tool": true,
+        "behavior": "refuse"
+      },
+      "metadata": {
+        "skill": "out_of_scope_weather",
+        "difficulty": "easy",
+        "what_it_tests": "Câu hỏi thời tiết hoàn toàn ngoài phạm vi IT helpdesk, agent phải từ chối mà không gọi tool nào."
+      }
+    },
+    {
+      "id": "GM01_clarify_then_hardware_check",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Kiểm tra phần cứng laptop của mình xem có lỗi gì không."
+        },
+        {
+          "role": "user",
+          "content": "Mã máy của mình dán ở đáy là LT-105."
+        },
+        {
+          "role": "user",
+          "content": "Kiểm tra đúng phần cứng trên máy LT-105 đó giúp mình."
+        }
+      ],
+      "failure_type": "missing_info",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "inspect_device",
+            "args": {
+              "asset_id": "LT-105",
+              "check": "hardware"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "multiturn_clarify_then_hardware_check",
+        "difficulty": "hard",
+        "what_it_tests": "Sau khi người dùng cung cấp mã máy LT-105, lượt cuối thực hiện kiểm tra hardware trên đúng máy đó."
+      }
+    },
+    {
+      "id": "GM02_carry_asset_change_check",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Kiểm tra mạng trên máy LT-501."
+        },
+        {
+          "role": "user",
+          "content": "Mạng máy đó bình thường rồi, giờ kiểm tra phần mềm trên máy đó giúp mình."
+        }
+      ],
+      "failure_type": "wrong_arg_value",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "inspect_device",
+            "args": {
+              "asset_id": "LT-501",
+              "check": "software"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "multiturn_carry_asset_change_check",
+        "difficulty": "hard",
+        "what_it_tests": "Giữ mã máy LT-501 từ lượt trước và cập nhật check sang software theo yêu cầu mới nhất."
+      }
+    },
+    {
+      "id": "GM03_correct_service_environment",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Kiểm tra trạng thái dịch vụ SSO trên production."
+        },
+        {
+          "role": "user",
+          "content": "À không, mình cần kiểm tra trên môi trường staging chứ không phải production."
+        }
+      ],
+      "failure_type": "wrong_arg_value",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "check_service_status",
+            "args": {
+              "service": "sso",
+              "environment": "staging"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "multiturn_correct_environment",
+        "difficulty": "medium",
+        "what_it_tests": "Lượt đính chính môi trường staging phải ghi đè lựa chọn production trước đó."
+      }
+    },
+    {
+      "id": "GM04_cancel_ticket_creation",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Lập ticket báo lỗi tài khoản bị khóa cho nhân viên EMP-1002."
+        },
+        {
+          "role": "user",
+          "content": "Thôi đừng tạo nữa, tài khoản đã được mở khóa rồi, hủy giúp mình."
+        }
+      ],
+      "failure_type": "unnecessary_tool",
+      "expect": {
+        "no_tool": true,
+        "behavior": "answer_without_tool"
+      },
+      "metadata": {
+        "skill": "multiturn_cancel_ticket",
+        "difficulty": "hard",
+        "what_it_tests": "Người dùng hủy yêu cầu tạo ticket thì không được gọi clarify hay create_ticket."
+      }
+    },
+    {
+      "id": "GM05_latest_intent_overrides_search",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Tìm tài liệu hướng dẫn cấp phát máy tính mới cho nhân viên."
+        },
+        {
+          "role": "user",
+          "content": "Thôi bỏ qua tài liệu, tra cứu thông tin nhân viên EMP-1005 giúp mình trước."
+        }
+      ],
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup_user",
+            "args": {
+              "employee_id": "EMP-1005"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "multiturn_latest_intent_wins",
+        "difficulty": "medium",
+        "what_it_tests": "Ý định mới nhất tra cứu nhân viên ghi đè hoàn toàn yêu cầu tìm tài liệu trước đó."
+      }
+    }
+  ]
 }

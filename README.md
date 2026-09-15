@@ -77,6 +77,17 @@ python run_eval.py --provider openrouter --version v0 --suite base --eval-cases 
 
 Thay `openrouter` bằng `openai`, `anthropic` hoặc `gemini` khi dùng provider khác. Không commit `.env`.
 
+### Chạy Giao Diện Web UI (CP4)
+
+Nhóm đã xây dựng sẵn Web UI trực quan hóa Tool Calling, Arguments, kết quả thực thi và lưu transcript tự động:
+
+```powershell
+cd starter_v0
+python ui.py --port 8000
+```
+Mở trình duyệt truy cập: `http://localhost:8000` để trò chuyện, kiểm tra tool call theo thời gian thực và tải transcript JSON.
+
+
 ## Tài liệu cần đọc
 
 | File | Dùng khi |

@@ -1,1 +1,2 @@
 version,author,changed_artifact,artifact_version,prompt_hash,tools_hash,reason,hypothesis,metric_name,metric_before,metric_after,run_file
+v0,Team,starter_baseline,v0+p27467914bc4d+td4848549884e,27467914bc4dae299b8030ae43fbe0255b76cfb591b65893d56f6a73c1d45143,d4848549884e93f60fca1bdf5eebcc386616428c0b58e653066928e217036495,Initial baseline before optimization,Baseline without custom prompt constraints,case_accuracy,N/A,0.6667,runs/v0_B_base_openrouter_20260915T185049740990.json
