@@ -8,9 +8,9 @@
 - Người đại diện / MSSV: Ngô Văn Giáp / 2A202602644
 - Tên repo: `K4-L3B-DAY04-6h50`
 - URL repo: https://github.com/ngogiap/K4-L3B-Day04-6h50
-- Nhánh nộp: chưa xác nhận; nhánh làm việc hiện tại là `trung02513`.
-- Commit chốt: chưa chốt; HEAD lúc rà soát là `0546211` (CP3.1), còn thay đổi chưa commit và merge chưa hoàn tất.
-- Deadline: theo [SUBMISSION.md](SUBMISSION.md), mặc định 23:59 ngày làm lab, UTC+07:00. Chưa xác nhận ngày/hạn áp dụng từ lớp; chưa có link thông báo đổi hạn.
+- Nhánh nộp: demo
+- Commit chốt: demo
+- Deadline áp dụng và link thông báo đổi hạn nếu có: không có
 
 ## Thành viên
 
