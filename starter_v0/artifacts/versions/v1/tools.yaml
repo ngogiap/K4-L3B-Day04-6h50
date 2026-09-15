@@ -13,9 +13,9 @@ tools:
       type: object
       properties:
         question: {type: string, default: "", description: "Câu hỏi"}
-        response_type: {type: string, enum: [text, yes_no, choice], default: "text", description: "Luôn truyền rõ: text khi hỏi thông tin/mã định danh; yes_no khi xác nhận hành động; choice khi cần chọn giữa các phương án cụ thể, kèm options."}
+        response_type: {type: string, enum: [text, yes_no, choice], default: "text", description: "Kiểu trả lời"}
         options: {type: array, default: [], items: {type: string}, description: "Các lựa chọn"}
-      required: [question, response_type]
+      required: [question]
 
   - name: search_kb
     description: "Tìm hướng dẫn hỗ trợ kỹ thuật."
@@ -42,8 +42,8 @@ tools:
       type: object
       properties:
         asset_id: {type: string, description: "Mã tài sản"}
-        check: {type: string, enum: [all, network, vpn, security, hardware, software], default: "all", description: "Luôn truyền rõ nhóm kiểm tra theo vấn đề người dùng: vpn cho kết nối VPN, network cho mạng/Wi-Fi, security cho bảo mật, hardware cho phần cứng, software cho phần mềm. Dùng all khi yêu cầu kiểm tra tổng thể hoặc không nêu nhóm cụ thể."}
-      required: [asset_id, check]
+        check: {type: string, enum: [all, network, vpn, security, hardware, software], default: "all", description: "Nhóm kiểm tra"}
+      required: [asset_id]
 
   - name: lookup_user
     description: "Tra cứu người dùng trong danh bạ hỗ trợ."

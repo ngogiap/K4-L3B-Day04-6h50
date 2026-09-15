@@ -10,7 +10,7 @@
 - Team:
 - Thành viên và INDIVIDUAL: [TEAM.md](../../TEAM.md)
 - Members:
-- Provider/model:
+- Provider/model: OpenRouter / `openai/gpt-4o-mini`, temperature `0.0` trong CP2.
 
 # PHẦN A — Giới thiệu agent
 
@@ -50,16 +50,34 @@ total_cases`, và tool result error đã được review thủ công.
 
 | Version | Prompt/tool change | Hypothesis | Metric | Before | After | Run file |
 |---|---|---|---|---:|---:|---|
-| v0 | baseline |  |  |  |  |  |
-| v1 |  |  |  |  |  |  |
-| v2 |  |  |  |  |  |  |
-| v3 |  |  |  |  |  |  |
+| v0 | baseline | Đo bản gốc | case_accuracy | — | 70% (21/30) | [run v0](../runs/v0_B_base_openrouter_20260915T183850004285.json) |
+| v1 | Prompt: hỏi lại khi thiếu thông tin | Giảm tự đoán mã/môi trường | case_accuracy | 70% | 66,67% (20/30) | [run v1](../runs/v1_B_base_openrouter_20260915T190345556504.json) |
+| v2 | Tools: bắt buộc và mô tả response_type/check | Giảm thiếu/sai tham số | case_accuracy | 66,67% | 83,33% (25/30) | [run v2](../runs/v2_B_base_openrouter_20260915T190520255653.json) |
+| v3 | Prompt: xác nhận payload ticket hiện tại | Giảm gọi tạo ticket trước xác nhận/sau sửa | case_accuracy | 83,33% | 90% (27/30) | [run v3](../runs/v3_B_base_openrouter_20260915T190636563922.json) |
+
+Chi tiết: [CP2_REPORT.md](CP2_REPORT.md), [version_log.csv](version_log.csv),
+[phân tích 120 dòng](run-analysis.csv), snapshot tại `versions/v0/`–`versions/v3/`.
+Các run dùng cùng 30 case, model và temperature; mỗi run có 0 provider errors,
+30/30 measured. Hash snapshot đã đối chiếu với JSON. Công cụ hỗ trợ: Codex.
+Mỗi thành viên cần tự kiểm tra evidence và tự viết INDIVIDUAL.
 
 ## B2. Failure analysis
 
 | Case ID | Failure type | Actual calls | What failed | Fix |
 |---|---|---|---|---|
-|  |  |  |  |  |
+| H10, H11 | Thiếu thông tin/input | v0 inspect_device/lookup_user; v1 clarify | v1 chọn đúng tool nhưng thiếu response_type | v2 bắt buộc response_type, cả hai đạt |
+| H02, H13, H17 | Sai/thiếu input | inspect_device | v1 thiếu check hoặc chọn all thay vpn | v2 bắt buộc check và mô tả phạm vi, cả ba đạt |
+| M05, M09 | Ranh giới xác nhận | v2 create_ticket và lookup_user ở M05; create_ticket ở M09 | Gọi tạo trước xác nhận hoặc khi nội dung đã thay đổi | v3 hỏi lại bằng clarify, cả hai đạt |
+| H04 | Gọi thừa | v3 lookup_user + inspect_device | Dùng mã nhân viên làm mã máy; asset_not_found | Còn lỗi; vòng sau làm rõ phạm vi lookup và loại mã |
+| H12 | Sai input | v3 clarify | response_type=text thay vì yes_no | Đã ngừng tạo ticket ở run v3 nhưng chưa đạt; cần làm rõ mô tả xác nhận |
+| H19 | Thiếu thông tin | v3 check_service_status | Tự chọn môi trường thay vì clarify | Còn lỗi; cần làm rõ môi trường chưa được chốt |
+
+V1 giảm điểm dù routing tăng; giả thuyết chỉ được hỗ trợ một phần. V2 sửa 5 case;
+v3 sửa thêm M05/M09, không có case đạt ở v2 chuyển thành lỗi ở v3. Mỗi phiên bản
+chỉ chạy một lần nên chưa đo được độ ổn định. Tool result đã được kiểm tra:
+v0–v2 có ticket giả lập được tạo khi chưa xác nhận; v2 còn tạo ở M09 sau sửa payload.
+V3 không gọi create_ticket trong bộ base, nhưng H04 vẫn trả asset_not_found.
+Không suy ra an toàn toàn diện từ điểm routing; CP3 vẫn cần thực hiện riêng.
 
 ## B3. Team eval cases
 
